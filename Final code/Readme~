@@ -1,0 +1,268 @@
+This readme file contains explanation for all functions and structures and steps to run the code prog.cpp.
+
+
+The global.h in the same directory contains all header files,constants,structures and function names.
+
+
+
+..............................................................
+To run the code do the following:
+..............................................................
+1) Go to the current directory in terminal
+2) Copy paste 
+g++ prog.cpp
+3)./a.out to run
+4)Enter the geometry of subdivision you want to use for the quadtree  
+5)Next enter the method of subdivision.New method refers to dividing White cells until you find a grey cell and then continue with dividing only grey cells.Normal method refers to dividing both White and grey cells till last level of subdivision
+6)Enter if you want to track neighbouring grey cells or not.
+7)Enter the depth of subdivision of quadtree.
+8)The program shows CPU time and No: of nodes as output. 
+9) In folder "new" in the same directory we have either da1.m,da2.m or da3.m after running the program.The three files correspond to plot of function using rectangle,triangle and quadtree sudivision respectively.
+10)Go to Matlab and set the current directory to "new" where we have all the .m files and double click on the required .m file.Note that when you first run the program you will have only one .m file depending on the geometry you choose.
+11)Clear the data inside the folder when you are ready for the next run
+
+
+
+..............................................................
+..............................................................
+                       STRUCTURES
+..............................................................
+..............................................................
+
+1)typedef struct queue queue;
+
+This structure contains node_ptr pointer to make the queue element point to a particular node and next pointer to point to the next queue element.
+
+---------------------------------------------------------------
+
+2)typedef struct top top;
+
+This sructure contains node_top pointer to point to the root node,q_top pointer to point to the first element of the queue.
+It also contains choice to store the choice of geometry,subdivide flag to store the method of subdivision we follow and nbr flag to store whether we track neighbours or not. 
+
+---------------------------------------------------------------
+
+3)typedef struct Node Node;
+
+Node *child[4]     -> Pointers to four chid nodes
+Point pt[4]        -> Array of Point type to store the vertices of a node
+int flag 	   -> To store the state of nodes
+double width       -> To store the width of rectangular nodes
+double height	   -> To store the height of rectangular nodes
+Node *parent	   -> Pointer to parent node
+queue *back	   -> Pointer from node to queue element
+int level	   -> Storing the level of the nodes
+int num 	   -> Flag to store number of linked neighbours
+double func_val[4] -> Array to store function values at four vertices
+Node *link[10]	   -> Pointer to neighbours(taken as 10 considering both rectangular             					            and triangular geometry)
+Node():num(0){ }   -> Initialising num to 0
+
+---------------------------------------------------------------
+
+4)typedef struct Point Point;
+
+Structure to hold x coordinate and y coordinate seperately.
+
+---------------------------------------------------------------
+
+
+
+..............................................................
+..............................................................
+                       FUNCTIONS
+..............................................................
+..............................................................
+
+1)void qtree::open(int a)
+
+This function takes in an integer as input which is used in naming the .m file depending on the geometry you choose.
+
+This function is reponsible for opening a .m file in the new folder.It also includes a few initial commands in the .m file created.
+
+---------------------------------------------------------------
+
+2)void qtree::close()
+
+This function closes the initial braces which encloses the set of solution points obtained from the quadtree.
+
+---------------------------------------------------------------
+
+3)void qtree::call(Node *n,FILE *p,int c)
+
+The first input argument is the pointer to the node passed.In every case this function is called from main by passing the root node and the solution nodes are found by calling the function in recursion.
+
+The second argument is the pointer to .m file created into which the solution points are exported.
+
+The third argument is the choice of geometry chosen in the beginning during running of the program.
+
+This function is called to create a matrix of solution points in the .m file.Depending on the geometry the points are chosen.In case of Rectangle or circle root node,since the final set of nodes are rectangles the solution points are taken as centre of the rectangular GREY or RED nodes.In case of triangular geometry the centroids of the triangular GREY or RED nodes are taken.
+
+---------------------------------------------------------------
+
+4)void qtree::mat_tree(Node *n,FILE *p,int c)
+
+The first input argument is the pointer to the node passed.In every case this function is called by passing the root node and the required nodes are found by calling the function in recursion.
+
+The second argument is the pointer to .m file created into which the actual points of the quadtree (i.e) the vertices of the final set of rectanges or triangles is also exported.
+
+The third argument is the choice of geometry chosen in the beginning during running of the program.
+
+Please Note that this function has to be uncommented from the main function in order to be included.
+
+This function is used to draw the actual tree along with plot of the function in order to get a better idea of how subdivision takes place.It displays the set of all rectangles or triangles in the tree.
+
+---------------------------------------------------------------
+
+5)void qtree::node_Def(Node *n,Node *n_par,double theta,double R,double r,int c)
+
+The first input argument is the pointer to the node passed.root Node is passed when this is called for the first time in main.The other times the children node are passed one by one from the buildtree function.
+
+The second argument is the pointer to the parent node of the current node under consideration.
+
+The third argument is the theta value which is used only in case of circle geometry.This is used to find the sector under consideration during evaluation of the quadtree.
+
+The fourth and fifth arguments are the outer and inner radii of the sector under consideration.This again is used only in the circle geometry subdivision.
+
+The sixth argument is the choice of geometry chosen in the beginning during running of the program.
+
+This function defines the vertices,sets the initial flag as WHITE and level as 0 in the case of root node alone.For other nodes it defines the parent node pointer and also make the children nodes point to NULL initially.
+
+---------------------------------------------------------------
+
+6)Node* qtree::buildnode(Node *n,Node *n_par,int k,int c)
+
+The first input argument is the pointer to the node passed.This function is called from the buildtree function.
+
+The second argument is the pointer to the parent node of the current node under consideration.
+
+The third argument is to specify which among the four child nodes of Node n is currently under consideration.
+
+The fourth argument is the choice of geometry chosen in the beginning during running of the program.
+
+The function returns Node n which is passed as first input argument.
+
+This function is used to define vertices of the four children nodes of Node n passed.Depending on the geometry the vertices are defined in different cases.
+In case of rectangular or circular subdivision the child nodes and vertices are numbered as follows
+
+			       1-----------------0
+				|	|	|
+				|   1	|   0	|	
+				|	|	|
+				-----------------				
+				|	|	|	
+				|   2	|   3	|
+				|	|	|
+			       2-----------------3
+In case of triangular subdivision the child nodes are numbered as follows
+
+					0
+					|
+				      |   |
+				     | 	0  |
+                                    |       |
+                                    =========
+                                   |  |  2 | | 
+                                  |  1 |  | 3 |
+                                 |      ||     |
+	                       1 ================ 2
+
+---------------------------------------------------------------
+
+7)void qtree::buildtree(Node *n, int l,int c,int t)
+
+The first input argument is the pointer to the node passed.In every case this function is called by passing the root node and the required nodes are found by calling the function in recursion.
+
+The second argument is the level upto which you want your initial node to get divided.
+
+The third argument is the choice of geometry chosen in the beginning during running of the program.
+
+The fourth argument is your choice of whether you want to subdivide WHITE cells until you find the first GREY cell and then subdivide only GREY cells (new method) or subdivide all WHITE cells till the last level of subdivision(normal method).
+
+This function is used to build the tree for the input function.In the start of this function the flag of the node is got from the task function.Depending on the method chosen(fourth input argument t),the nodes are subdivided further accordingly.The nodes other than the root nodes also get their parent node and level defined in the function.
+
+---------------------------------------------------------------
+
+8)int qtree::task(Node *n,int c)
+
+The first input argument is the pointer to the node under consideration.
+
+The second argument is the choice of geometry chosen in the beginning during running of the program.
+
+This function calls func which calculates the value of the function at all vertices of the node.This function returns the state of each node (i.e) whether the node is BLACK,WHITE,GREY or RED.
+
+If all vertices return a positive value then flag is taken as WHITE.
+If all vertices return a negative value then flag is taken as BLACK.
+If all vertices return zero value then flag is taken as RED.Refer function to see what is zero for a function.
+If atleast one vertex returns complex value then flag is taken as WHITE.
+In all other cases flag is taken as GREY.
+
+---------------------------------------------------------------
+
+9)int qtree::func(Node *n,int d)
+
+The first input argument is the pointer to the node under consideration.
+
+The second input argument is the number of vertices of the node.It is 3 in case of triangular subdivision and 4 in case of rectangular or circular subdivision.
+
+This function calculates the value of the function at a particular vertex and returns an integer depending on the type of value.It also stores the value of the function at four vertices in an array element of type node.
+It returns  1 if the function value is positive.
+It returns -1 if the function value is negative.
+It returns  0 if the function value lies betwenn -EPS and EPS.
+It returns 10 if the function value is complex at that vertex.
+
+---------------------------------------------------------------
+
+10)void qtree::print(Node *n)
+
+The only input argument is the pointer to the node passed.In every case this function is called by passing the root node from main and the solution nodes are found by calling the function in recursion.
+
+Please Note that this function has to be uncommented from the main function in order to be included.
+
+This function is used to print the solution points on the screen.The solution points are centres of the final GREY and RED rectangles or triangles.
+
+---------------------------------------------------------------
+
+11)void qtree::deletetree(Node *n)
+
+The only input argument is the pointer to the node passed.In every case this function is called by passing the root node and the required nodes are found by calling the function in recursion.
+
+This function deletes all the nodes related to the quadtree.
+
+---------------------------------------------------------------
+
+12)void qtree::create_q(Node *n,queue *q_par)
+
+The first input argument is the pointer to the node passed.In every case this function is called by passing the root node and the required nodes are found by calling the function in recursion.
+
+The second input argument is a pointer of type queue which essentially is the first element of the queue created.This queue contains details of the root node.
+
+This function creates a queue of all nodes.Each queue element has a node_ptr which points to a particular node.It also has a next pointer to point to the next queue element.The back pointer of type queue also points back from the node to the queue.
+
+---------------------------------------------------------------
+
+13)void qtree::create_link(Node *n,Node *nd,int c)
+
+The first input argument is the pointer to the node passed.This is passed from the nbr function and is one of the nodes from the entire GREY nodes.This node is fixed in one call of create_link from nbr.
+
+The second input argument is root node when first passed from the nbr function.The function is called in recursion to pass all GREY nodes one by one in the workspace through this argument.
+
+The third argument is the choice of geometry chosen in the beginning during running of the program.
+
+This function makes every GREY node in the workspace to point to all neighbouring GREY nodes.The first argument is a fixed node passed from the nbr function and the workspace is checked for other GREY nodes by calling the function in recursion.
+
+---------------------------------------------------------------
+
+14)void qtree::nbr(Node *n, Node *root,int c)
+
+The first input argument is the pointer to the node.During its first call from main it is the root node.Through recursion all GREY nodes in the workspace are extracted and passed to create_link function.
+
+The second input argument is the root node pointer which remains the same through all recursion calls.
+
+The third argument is the choice of geometry chosen in the beginning during running of the program.
+
+This function is called from main to extract GREY cells one by one and pass it to create_link function to link it to neighbouring GREY cells.
+
+---------------------------------------------------------------
+---------------------------------------------------------------
+
+

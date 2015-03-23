@@ -1,0 +1,7 @@
+This folder contains the graphs of certain results obtained from the program for the Hyperbola function 2x^2 -y^2 -1=0
+
+Depth VS No: of Nodes
+Depth VS CPU Time
+Depth VS RMS value
+
+The .m files of the plots present are also saved here

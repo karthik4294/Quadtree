@@ -1,0 +1,3 @@
+This folder contains various other codes developed before the final code was developed.
+
+The folder also contains the Rectangular,Triangular and circular subdivision as seperate .cpp files.They are respectively trial_quad.cpp,triangle1.cpp & triangle2.cpp,r-theta.cpp
