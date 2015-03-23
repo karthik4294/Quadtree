@@ -8,7 +8,7 @@ using namespace std;
 int w=0;//Variable to store total number of nodes
 double g=0;//rms
 int h=0;//rms
-int f = 0;
+int f = 0;//TNo: of function evaluations
 
 //General Node definitions
 int BLACK = -1;//Node boundary is completely inside the curve
